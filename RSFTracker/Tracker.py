@@ -5,6 +5,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 # Import pandas for data analysis
 import pandas as pd
 import datetime
+from datetime import datetime
 import csv
 
 pd.set_option('display.max_columns', None)
@@ -36,4 +37,32 @@ def createCSV():
     writer.writerows(days)
     f.close()
 
-createCSV()
+def insertDataPoint():
+    now = datetime.now()
+    current_time = now.strftime("%H:%M")
+    day = datetime.today().weekday()
+    data_list = []
+    with open("RSFData.csv") as clone:
+        data = csv.reader(clone)
+        for row in data:
+            data_list.append(row)
+    hm = current_time.split(':')
+    h = int(hm[0])
+    m = int(hm[1])
+    index = 6 * (h - 7) + m//10 + 1 
+    data_point = getDataPoint()
+    if (len(data_list[day + 1]) >= index):
+        if data_list[day + 1][index].equals(""):
+            data_list[day + 1][index] = data_point
+    else:
+        while (len(data_list[day + 1]) < index):
+            data_list[day + 1].append("")
+        data_list[day + 1].append(data_point)
+    with open("RSFData.csv", 'w') as write:
+        writer = csv.writer(write)
+        for row in data_list:
+            writer.writerow(row)
+
+insertDataPoint()
+
+
